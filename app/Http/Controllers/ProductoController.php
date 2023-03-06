@@ -25,13 +25,17 @@ class ProductoController extends Controller
 
     public function store(Request $request) {
 
+        
+
         $validate = Validator::make($request->all(), [
             'name'=>'required',
-            
+            'image_path' => 'required|mimes:jpg,jpeg,png,gif',
             'description' => 'required',
             'price' => 'required',
             'category_id' => 'required'
         ]);
+
+        
         
         if($validate->fails()){
             return response()->json([
@@ -39,16 +43,20 @@ class ProductoController extends Controller
                 'errors'=>$validate->messages(),
             ]);
         }
-        else{
+        else{            
             $product = new Producto;
             //recogiendo la imagen
             $image_path = $request->file('image_path');
 
-            //subir fichero
-            if($image_path){
-                $image_path_name = time().$image_path->getClienteOriginalName();
-                Storage::disk('images')->put($image_path_name, File::get($image_path));
+            
+            
 
+            //subir fichero
+            if($image_path){                
+                $image_path_name = time().$image_path->getClientOriginalName();                                
+                Storage::disk('images')->put($image_path_name, File::get($image_path)); 
+                //var_dump($image_path_name);
+                //die();               
                 $product->image_path = $image_path_name;
             }
             if($request->input('subCategoria_id')){
@@ -158,5 +166,4 @@ class ProductoController extends Controller
             ]);
         }
     }
-    
 }
